@@ -1,0 +1,2 @@
+Everything should be set to run the r script all the way through. it will create a table with quarterback WAR and an additional column I created WAA 
+which is similar just how many (wins against average) at that position. the r script has brief descriptions explaining what exactly is being done.
