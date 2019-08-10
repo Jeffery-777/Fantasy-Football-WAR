@@ -1,0 +1,654 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Data Setup:
+```{r}
+library(readr)
+library(tidyverse)
+library(psych)
+qb_18 <- read_csv("D:/Fantasy Week By Week/QB.csv") %>%
+  filter(Year == 2018)
+qb_18 <- mutate(qb_18, Stand_Points = (Yards * .04) + (TD *4) + (Two_Pass * 2) + (Rush_Yards * .1) + (Rush_TD * 6) + (Two_Rush * 2) + (Rec_Yards * .1) + 
+                  (Rec_TD * 6) + (Two_Rec * 2))
+
+
+RB <- read_csv("D:/Fantasy Week By Week/RB.csv")
+rb_18 <- mutate(RB, Stand_Points = (Yards * .04) + (TD *4) + (Two_Pass * 2) + (Rush_Yards * .1) + (Rush_TD * 6) + (Two_Rush * 2) + (Rec_Yards * .1) + 
+                  (Rec_TD * 6) + (Two_Rec * 2))
+
+WR <- read_csv("D:/Fantasy Week By Week/WR.csv")
+wr_18 <- mutate(WR, Stand_Points = (Yards * .04) + (TD *4) + (Two_Pass * 2) + (Rush_Yards * .1) + (Rush_TD * 6) + (Two_Rush * 2) + (Rec_Yards * .1) + 
+                  (Rec_TD * 6) + (Two_Rec * 2))
+
+TE <- read_csv("D:/Fantasy Week By Week/TE.csv")
+
+TE <- mutate(TE, Stand_Points = (Yards * .04) + (TD *4) + (Two_Pass * 2) + (Rush_Yards * .1) + (Rush_TD * 6) + (Two_Rush * 2) + (Rec_Yards * .1) + (Rec_TD * 6) + (Two_Rec * 2))
+
+K <- read_csv("D:/Fantasy Week By Week/K.csv")
+DST <- read_csv("D:/Fantasy Week By Week/DST.csv")
+
+```
+
+
+Figure out what the average team scores per week 
+
+```{r}
+#QB
+qb_top_12 <- qb_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(n = 12, wt = total_pts)
+
+qb_top_12 <- qb_top_12$Player
+
+qb__ave_metrics <- qb_18 %>%
+  filter(Player %in% qb_top_12) 
+
+describe(qb__ave_metrics$Stand_Points)
+
+
+#RB
+rb_top_24 <- rb_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(n = 24, wt = total_pts)
+
+rb_top_24 <- rb_top_24$Player
+
+rb_ave_metrics <- rb_18 %>%
+  filter(Player %in% rb_top_24)
+describe(rb_ave_metrics$Stand_Points)
+
+
+
+
+#WR
+
+wr_top_24 <- wr_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(24, wt = total_pts) 
+
+wr_top_24_players <- wr_top_24$Player
+
+total_wr_24 <- wr_18 %>%
+  filter(Player %in% wr_top_24_players)
+
+describe(total_wr_24$Stand_Points)
+
+
+
+#FLEX
+
+#RB qualifying flex pool
+rb_flex <- rb_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(36, wt = total_pts) %>%
+  top_n(-12, wt = total_pts)
+
+rb_flex_players <- rb_flex$Player
+
+rb_flex <- rb_18 %>%
+  filter(Player %in% rb_flex_players)
+
+#WR qualifying flex pool
+wr_flex <- wr_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(36, wt = total_pts) %>%
+  top_n(-12, wt = total_pts)
+wr_flex_players <- wr_flex$Player
+
+wr_flex <- wr_18 %>%
+  filter(Player %in% wr_flex_players)
+
+#TE qualifying flex pool
+te_flex <- TE %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(24, wt = total_pts) %>%
+  top_n(-12, wt = total_pts)
+te_flex_players <- te_flex$Player
+
+te_flex <- TE %>%
+  filter(Player %in% te_flex_players)
+
+
+#calculate average of the best 12 flex qualifiers
+flex <- bind_rows(rb_flex,wr_flex,te_flex)
+
+flex <- mutate(flex, Stand_Points = (Yards * .04) + (TD *4) + (Two_Pass * 2) + (Rush_Yards * .1) + (Rush_TD * 6) + (Two_Rush * 2) + (Rec_Yards * .1) + (Rec_TD * 6) + (Two_Rec * 2))
+
+flex_players <- flex %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(12, wt = total_pts)
+
+flex_players <- flex_players$Player
+
+flex <- flex %>%
+  filter(Player %in% flex_players)
+
+describe(flex$Stand_Points)
+
+
+
+#TE1
+
+te_12 <- TE %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(12, wt = total_pts) 
+
+te_players <- te_12$Player
+
+te_12 <- TE %>%
+  filter(Player %in% te_players)
+
+describe(te_12$Stand_Points)
+
+
+
+#kickers
+
+k_12 <- K %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(12, wt = total_pts) 
+
+k_players <- k_12$Player
+
+k_12 <- K %>%
+  filter(Player %in% k_players)
+
+describe(k_12$Points)
+
+#dst
+
+dst_12 <- DST %>%
+  group_by(Team) %>%
+  summarise(total_pts = sum(`Pts*`)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(12, wt = total_pts) 
+
+dst_players <- dst_12$Team
+
+dst_12 <- DST %>%
+  filter(Team %in% dst_players)
+
+describe(dst_12$`Pts*`)
+
+
+
+```
+
+
+Each describe call gives the mean and std for each position which are:
+QB: 21.75, 7.98
+RB: 13.74, 8.44
+RB: 13.74, 8.44
+WR: 11.5, 6.8
+WR: 11.5, 6.8
+TE: 8.09, 6.29
+FlX: 8.65, 6.01
+K:   8.89, 4.12
+DST: 10.57, 6.77
+
+```{r}
+#fantasy team average weekly score
+21.75 + 13.74 + 13.74 + 11.5 + 11.5 + 8.09 + 8.65 + 8.89 + 10.57
+
+#fantasy team average weekly score standard deviation
+sqrt(7.98^2 + 8.44^2 + 8.44^2 + 6.8^2 + 6.8^2 + 6.29^2 + 6.01^2 + 4.12^2 + 6.77^2)
+```
+
+2018's average team total standard deviation = 108.43
+2018's average team total standard deviation = 20.90
+
+Compute win probabilities
+```{r}
+
+qb_18 <- mutate(qb_18, exp_team_score = (Stand_Points - 21.75) + 108.43)
+
+for (i in 1:nrow(qb_18)) {
+  qb_18$win_prob[i] <- pnorm(qb_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+
+```
+
+Use probabilities column to do work on replacement level qb
+
+```{r}
+qb_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(n = 12, wt = total_pts) %>%
+  top_n(-1)
+
+qb_18 %>%
+  filter(Player == "Philip Rivers") %>%
+  summarise(mean = mean(Stand_Points), per = mean(win_prob))
+
+
+```
+
+
+Create table with war results and wins above average (WAA) results.
+```{r}
+war_qb <- qb_18 %>%
+  group_by(Player) %>%
+  summarize(Position = "QB", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = round(Avr_Win_Percent*12,2), WAA = Wins_exp -6.5, repl_per = 0.457798, repl_wins = round(0.457798*12,2), WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(Stand_Points),2)) %>%
+  filter(Games >7) %>%
+  arrange(desc(WAR)) %>%
+  select(Player, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_qb, file = "qb_war_cleaned.csv")
+```
+
+#Running Backs
+
+```{r}
+rb_top_12 <- rb_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(24, wt = total_pts) 
+rb_names <- rb_top_12$Player
+
+rb_top_12 <- rb_18 %>%
+  filter(Player %in% rb_names)
+
+describe(rb_top_12$Stand_Points)
+
+#find replacement level player
+rb_top_12 %>%
+  group_by(Player) %>%
+  summarize(pts = sum(Stand_Points)) %>%
+  top_n(24,wt = pts) %>%
+  top_n(-1)
+
+rb_18 %>%
+  filter(Player == "Matt Breida") %>%
+  summarize(mean = mean(Stand_Points))
+
+#Now to compute a fantasy teams expected weekly score based on individual player performance
+rb_18 <- mutate(rb_18, exp_team_score = (Stand_Points - 13.74) + 108.43)
+
+#find all rb players' win percentage using pnorm function
+for (i in 1:nrow(rb_18)) {
+  rb_18$win_prob[i] <- pnorm(rb_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+#not gonna lie dont think i need this
+rb_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(24) %>%
+  top_n(-1)
+
+#find replacement level player average
+rb_18 %>%
+  filter(Player == "Matt Breida") %>%
+  summarise(games = n(), pts = sum(Stand_Points), mean = pts/games, mean(win_prob))
+
+#find average (WAA)
+rb_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  summarise(mean = mean(win_per))
+
+```
+
+
+
+```{r}
+war_rb <- rb_18 %>%
+  group_by(Player) %>%
+  summarize(Position = "RB", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = Avr_Win_Percent*12, WAA = round(Wins_exp - (0.5485648 * 12),2), repl_per = 0.4273719	, repl_wins = 0.4273719	*12, WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(Stand_Points),2)) %>%
+  arrange(desc(WAR)) %>%
+  select(Player, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_rb, file = "rb_war_cleaned.csv")
+```
+
+
+#wide receivers
+
+```{r}
+wr_top_12 <- wr_18 %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(24, wt = total_pts) 
+wr_names <- wr_top_12$Player
+
+wr_top_12 <- wr_18 %>%
+  filter(Player %in% wr_names)
+
+describe(wr_top_12$Stand_Points)
+
+#find replacement level player
+wr_top_12 %>%
+  group_by(Player) %>%
+  summarize(pts = sum(Stand_Points)) %>%
+  top_n(24,wt = pts) %>%
+  top_n(-1)
+
+wr_18 %>%
+  filter(Player == "Chris Godwin") %>%
+  summarize(mean = mean(Stand_Points))
+
+#Now to compute a fantasy teams expected weekly score based on individual player performance
+wr_18 <- mutate(wr_18, exp_team_score = (Stand_Points - 11.5) + 108.43)
+
+#find all rb players' win percentage using pnorm function
+for (i in 1:nrow(wr_18)) {
+  wr_18$win_prob[i] <- pnorm(wr_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+#not gonna lie dont think i need this
+wr_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(24) %>%
+  top_n(-1)
+
+#find replacement level player average
+wr_18 %>%
+  filter(Player == "Chris Godwin") %>%
+  summarise(games = n(), pts = sum(Stand_Points), mean = pts/games, mean(win_prob))
+
+#find average (WAA)
+wr_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  summarise(mean = mean(win_per))
+```
+
+
+
+```{r}
+war_wr <- wr_18 %>%
+  group_by(Player) %>%
+  summarize(Position = "WR", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = Avr_Win_Percent*12, WAA = round(Wins_exp - (0.5485648 * 12),2), repl_per = 0.4446059, repl_wins = 0.4446059*12, WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(Stand_Points),2)) %>%
+  arrange(desc(WAR)) %>%
+  select(Player, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_wr, file = "wr_war_cleaned.csv")
+```
+
+#tight ends
+
+```{r}
+te_top_12 <- TE %>%
+  group_by(Player) %>%
+  summarise(total_pts = sum(Stand_Points)) %>%
+  arrange(desc(total_pts)) %>%
+  top_n(12, wt = total_pts) 
+te_names <- te_top_12$Player
+
+te_top_12 <- TE %>%
+  filter(Player %in% te_names)
+
+describe(te_top_12$Stand_Points)
+
+#find replacement level player
+te_top_12 %>%
+  group_by(Player) %>%
+  summarize(pts = sum(Stand_Points)) %>%
+  top_n(12,wt = pts) %>%
+  top_n(-1)
+
+TE %>%
+  filter(Player == "Vance McDonald") %>%
+  summarize(mean = mean(Stand_Points))
+
+#Now to compute a fantasy teams expected weekly score based on individual player performance
+te_18 <- mutate(TE, exp_team_score = (Stand_Points - 8.09) + 108.43)
+
+#find all rb players' win percentage using pnorm function
+for (i in 1:nrow(te_18)) {
+  te_18$win_prob[i] <- pnorm(te_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+#not gonna lie dont think i need this
+te_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(12) %>%
+  top_n(-1)
+
+#find replacement level player average
+te_18 %>%
+  filter(Player == "Vance McDonald") %>%
+  summarise(games = n(), pts = sum(Stand_Points), mean = pts/games, mean(win_prob))
+
+#find average (WAA)
+te_18 %>%
+  group_by(Player) %>%
+  summarize(win_per = mean(win_prob)) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  summarise(mean = mean(win_per))
+```
+
+```{r}
+war_te <- te_18 %>%
+  group_by(Player) %>%
+  summarize(Position = "TE", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = Avr_Win_Percent*12, WAA = round(Wins_exp - (0.5485648 * 12),2), repl_per = 0.4540056, repl_wins = 0.4540056*12, WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(Stand_Points),2)) %>%
+  arrange(desc(WAR)) %>%
+  select(Player, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_te, file = "te_war_cleaned.csv")
+```
+
+#kickers
+
+For kickers and DST, replacement level will be done by week, not season so as to not inflate their WAR due to streaming
+
+```{r}
+kicker_12 <- K %>%
+  group_by(Week, Player) %>%
+  summarise(total_pts = sum(Points)) %>%
+  group_by(Week) %>%
+  arrange(desc(Week)) %>%
+  group_by(Week) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  summarise(week_ave = mean(total_pts), week_sd = sd(total_pts)) %>%
+  summarise(top_12_sea_ave = mean(week_ave), sd = mean(week_sd))
+
+k_18 <- mutate(K, exp_team_score = (Points - 8.89) + 108.43)
+
+#find all rb players' win percentage using pnorm function
+for (i in 1:nrow(k_18)) {
+  k_18$win_prob[i] <- pnorm(k_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+kick <- k_18 %>%
+  group_by(Week) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  group_by(Week) %>%
+  summarize(mean = mean(win_prob)) %>%
+  summarise(tot_mean = mean(mean))
+
+#gives a mean for replacement level kickers = 0.4931226	
+```
+
+
+```{r}
+war_k <- k_18 %>%
+  group_by(Player) %>%
+  summarize(Position = "K", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = Avr_Win_Percent*12, WAA = round(Wins_exp - (0.5485648 * 12),2), repl_per = 0.4931226	, repl_wins = 0.4931226	*12, WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(Points),2)) %>%
+  arrange(desc(WAR)) %>%
+  select(Player, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_k, file = "k_war_cleaned.csv")
+
+
+
+```
+
+
+
+#DST 
+```{r}
+dst_12 <- DST %>%
+  group_by(Week, Team) %>%
+  summarise(total_pts = sum(`Pts*`)) %>%
+  group_by(Week) %>%
+  arrange(desc(Week)) %>%
+  group_by(Week) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  summarise(week_ave = mean(total_pts), week_sd = sd(total_pts)) %>%
+  summarise(top_12_sea_ave = mean(week_ave), sd = mean(week_sd))
+
+dst_18 <- mutate(DST, exp_team_score = (`Pts*` - 10.57) + 108.43)
+
+#find all rb players' win percentage using pnorm function
+for (i in 1:nrow(dst_18)) {
+  dst_18$win_prob[i] <- pnorm(dst_18$exp_team_score[i], 108.43, 20.9) 
+}
+
+dst_18 %>%
+  group_by(Week) %>%
+  top_n(12) %>%
+  top_n(-1) %>%
+  group_by(Week) %>%
+  summarize(mean = mean(win_prob)) %>%
+  summarise(tot_mean = mean(mean))
+
+#gives a mean for replacement level kickers = 0.4723855
+```
+
+
+```{r}
+war_dst <- dst_18 %>%
+  group_by(Team) %>%
+  summarize(Position = "DST", Avr_Win_Percent = mean(win_prob), Games = n(), Wins_exp = Avr_Win_Percent*12, WAA = round(Wins_exp - (0.5485648 * 12),2), repl_per = 0.4723855, repl_wins = 0.4723855*12, WAR = round(Wins_exp - repl_wins,2), Ave_Week_Points = round(mean(`Pts*`),2)) %>%
+  arrange(desc(WAR)) %>%
+  select(Team, Position, Ave_Week_Points, Avr_Win_Percent, WAR, WAA)
+
+write.csv(war_dst, file = "dst_war_cleaned.csv")
+```
+
+
+#put it all together for requested top 300 WAR of 2018
+
+```{r}
+total_WAR_2018 <- bind_rows(war_qb, war_wr,war_rb,war_te, war_dst, war_k) 
+
+total_WAR_2018$Player <- if_else(is.na(total_WAR_2018$Player), total_WAR_2018$Team, total_WAR_2018$Player)
+
+total_WAR_2018$Team <- NULL
+
+total_WAR_2018 <- total_WAR_2018 %>%
+  filter(!Player == "Jaron Brown", !Player ==  "Michael Crabtree") %>%
+  arrange(desc(WAR)) %>%
+  top_n(300, wt = WAR) %>%
+  mutate(Round = rep(1:25, each = 12), Pick = rep(1:12, times = 25)) %>%
+  select(Round, Pick, Player, Position, WAR, Ave_Week_Points, Avr_Win_Percent)
+
+
+write.csv(total_WAR_2018, file = "FantasyPros_WAR_2018.csv")
+
+```
+
+
+# Other Interesting findings
+
+```{r}
+library(tidyverse)
+
+wp_qb <- qb_18 %>%
+  select(Position, win_prob)
+
+wp_rb <- rb_18 %>%
+  select(Position, win_prob)
+
+wp_wr <- wr_18 %>%
+  select(Position, win_prob)
+
+wp_te <- te_18 %>%
+  select(Position, win_prob)
+
+wp_k <- k_18 %>%
+  select(Position, win_prob)
+
+wp_dst <- dst_18 %>%
+  mutate(Position = "DST") %>%
+  select(Position, win_prob)
+
+all_wp <- bind_rows(wp_qb, wp_rb, wp_wr, wp_te, wp_k, wp_dst)
+
+#data set compiled, now to look at how big an effect top players in each pos did in single performances
+
+# this is a bonkers amazing graph!!
+all_wp$Position <- factor(all_wp$Position, levels = c("K", "DST","QB", "TE", "WR", "RB"))
+
+all_wp %>%
+  group_by(Position) %>%
+  top_n(50, wt = win_prob) %>%
+  ggplot(aes(win_prob, fill = Position))+
+  geom_density(alpha = .5, color = "gray")+
+  facet_grid(~Position,scale = "free_y", space = "free")+
+  theme_classic()+
+  ggtitle("Top 50 Player Impact on Fantasy Team Weekly Win Percentage\n By Position")+
+  ylab("")+
+  scale_y_continuous(breaks = NULL)+
+  xlab("Fantasy Team Win Percentage")+
+  scale_x_continuous(labels = scales::percent)+
+  theme(plot.title = element_text(hjust = 0.5, size = 18), legend.position = "none")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+Pat Mahomes Graph
+```{r}
+mahomes <- qb_18 %>%
+  filter(Player == "Patrick Mahomes")
+p2 <- ggplot(mahomes, aes(Week, win_prob))+
+  geom_line(color = "red", size = 1.2, alpha = .6)+
+  geom_text(aes(label = Stand_Points))+
+  geom_hline(yintercept = .4690) +
+  scale_x_continuous(breaks = c(1:17)) +
+  scale_y_continuous(labels = scales::percent,limits = c(0,1),  breaks = c(0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1))+
+  ylab("Fantasy Team Win Percentage") +
+  xlab("Week")+
+  ggtitle("Pat Mahomes \n Weekly Fantasy Team Win Percentage \n 2018")+
+  theme_classic() +
+  theme(plot.title = element_text(hjust = 0.5))
+p2
+```
+
+
+
+
+
+
+
+
+
+
+
+
