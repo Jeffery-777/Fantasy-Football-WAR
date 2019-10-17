@@ -1,0 +1,219 @@
+An R notebook to show Josh Hermsmeyer my work and I'm not even remotely nervous I did anything wrong at all. Nope not one bit. I'm pretty sure I did something wrong..
+
+#Get Data 
+
+The RDS is from Ben Baldwin's cleaning of NFLScrapR so I blame any potential flaws on him regarless of anything else. 
+```{r}
+Official_NFL_PBP_CLEANED <- readRDS("Official_NFL_PBP_CLEANED.rds")
+library(tidyverse)
+rush_data <- Official_NFL_PBP_CLEANED %>%
+  filter(play_type == "run")%>%
+  drop_na(rusher_player_name) %>%
+  select(1:75,88, 115:118,147, 150,154,253,254,257:260)
+```
+
+#Add Data
+
+Make objects for each seasons starting RBS. These might not be perfect but should be very close. I took this from PFR top backs listed in each year and eye-balled to try to take out any backup backs.
+```{r}
+starters_09 <- c("C.Johnson", "T.Jones", "S.Jackson", "A.Peterson","M.Jones-Drew","C.Benson","R.Grant","M.Forte","R.Rice","K.Moreno","R.Mendenhall","R.Williams","F.Jackson","F.Gore","B.Jacobs","L.Tomlinson","J.Stewart","J.Addai","K.Smith","D.Williams","M.Barber","C.Williams","J.Harrison","L.Maroney","J.Charles","L.Johnson","M.Turner","J.Jones","B.Wells", "L.McCoy", "M.Bell")
+
+starters_10 <- c("M.Turner", "S.Jackson","A.Foster","R.Mendenhall","C.Benson","C.Johnson","R.Rice","M.Jones-Drew","A.Peterson","A.Bradshaw","P.Hillis","T.Jones","M.Forte","J.Charles","B.Green-Ellis","D.McFadden","F.Jackson","L.Tomlinson","L.McCoy","F.Gore","M.Lynch","L.Bount","R.Brown","B.Jackson","S.Greene","F.Jones","K.Moreno","M.Tolbert","J.Stewart","J.Best")
+
+starters_11 <- c("M.Jones-Drew","M.Turner","R.Rice","M.Lynch","F.Gore","A.Foster","C.Benson","L.McCoy","C.Johnson","S.Jackson","M.Bush","S.Greene","W.McGahee","B.Wells","R.Mendenhall","R.Mathews","R.Bush","A.Peterson","M.Forte","L.Blount","B.Green-Ellis","B.Tate","A.Bradshaw","F.Jackson","D.Thomas","D.Murray","P.Hillis","D.Williams","T.Jones")
+
+starters_12 <- c("A.Foster","A.Peterson","A.Morris","D.Martin","M.Lynch","S.Ridley","J.Charles","B.Green-Ellis","S.Greene","C.Johnson","T.Richardson","F.Gore","S.Jackson","R.Rice","M.Forte","R.Bush","M.Turner","A.Bradshaw","D.McFadden","M.Leshoure","V.Ballard","C.Spiller","L.McCoy","R.Mathews","D.Williams","W.McGahee","D.Murray","J.Dwyer","M.Ingram","K.Moreno", "A.Green")
+
+starters_13 <- c("L.McCoy","M.Lynch","M.Forte","R.Mathews","E.Lacy","C.Johnson","A.Peterson","F.Gore","A.Morris","J.Charles","Z.Stacy","L.Bell","K.Moreno","M.Jones-Drew","R.Bush","B.Green-Ellis","R.Mendenhall","D.Murray","R.Rice","F.Jackson","D.Williams","T.Richardson","C.Ivory","B.Tate","S.Ridley","L.Miller","S.Jackson","R.Jennings","P.Thomas")
+
+starters_14 <- c("D.Murray","L.McCoy","L.Bell","M.Lynch","M.Forte","A.Morris","A.Foster","F.Gore","E.Lacy","J.Forsett","M.Ingram","J.Bell","J.Hill","A.Williams","L.Miller","J.Charles","A.Ellington","C.Ivory","s.Jackson","C.Anderson","T.Mason","J.Stewart","T.West","A.Blue","G.Bernard","M.Asiata", "B.Oliver","T.Richardson")
+
+starters_15 <- c("A.Peterson","D.Martin","L.Murray","D.Freeman","F.Gore","C.Ivory","J.Stewart","D.McFadden","T.Gurley","J.Hill","M.Forte","R.Hillman","L.McCoy","A.Morris","D.Williams","C.Johnson","R.Jennings","L.Miller","D.Murray","E.Lacy","I.Crowell","M.Gordon","A.Blue","T.Yeldon","M.Ingram","L.Blount","C.West","J.Starks","T.Rawls")
+
+starters_16 <- c("E.Elliot","L.Blount","D.Johnson","D.Murray","T.Gurley","L.Miller","F.Gore","L.Bell","J.Ajayi","M.Gordon","J.Howard","L.McCoy","D.Freeman","J.Hill","M.Forte","J.Stewart","C.Hyde","S.Ware","M.Ingram","I.Crowell","L.Murray","T.West","R.Jennings","D.Booker","R.Kelly","J.McKinnon","R.Mathews","D.Martin", "T.Yeldon")
+
+starters_17 <- c("L.Bell","L.McCoy","M.Gordon","T.Gurley","J.Howard","K.Hunt","L.Fournette","F.Gore","C.Anderson","E.Elliot","C.Hyde","L.Miller","M.Ingram","L.Murray","A.Collins","J.Ajayi","M.Lynch","I.Crowell","J.Stewart","D.Freeman","D.Murray","D.Lewis","J.Mixon","B.Powell","D.Henry","S.Perine","L.Blount","O.Darkwa","A.Abdullah","J.Williams")
+
+starters_18 <- c("E.Elliot","S.Barkley","D.Johnson","T.Gurley","A.Peterson","J.Howard","C.Carson","J.Mixon","P.Barber","C.McCaffrey","J.Conner","D.Henry","L.Miller","S.Michel","M.Mack","A.Kamara","N.Chubb","P.Lindsay","K.Hunt","M.Gordon","C.Hyde","D.Martin","T.Coleman","L.McCoy","F.Gore","L.Blount")
+
+```
+
+
+#Analyze
+```{r}
+#2009
+rush_09 <- rush_data %>%
+  filter(season == 2009, yardline_100 > 10, yardline_100 < 90, wp > .19, wp < .81)
+
+rush_09$IsStarter <- if_else(rush_09$name %in% starters_09, 1,0)
+
+#t.test for funsies.
+t.test(rush_09$yards_gained[rush_09$IsStarter == 1], rush_09$yards_gained[rush_09$IsStarter == 0])
+
+
+#2010
+rush_10 <- rush_data %>%
+  filter(season == 2010, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_10$IsStarter <- if_else(rush_10$name %in% starters_10, 1,0)
+
+t.test(rush_10$yards_gained[rush_10$IsStarter == 1], rush_10$yards_gained[rush_10$IsStarter == 0])
+
+#2011
+rush_11 <- rush_data %>%
+  filter(season == 2011,yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_11$IsStarter <- if_else(rush_11$name %in% starters_11, 1,0)
+
+t.test(rush_11$yards_gained[rush_11$IsStarter == 1], rush_11$yards_gained[rush_11$IsStarter == 0])
+
+
+#2012
+rush_12 <- rush_data %>%
+  filter(season == 2012, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_12$IsStarter <- if_else(rush_12$name %in% starters_12, 1,0)
+
+t.test(rush_12$yards_gained[rush_12$IsStarter == 1], rush_12$yards_gained[rush_12$IsStarter == 0])
+
+#2013
+rush_13 <- rush_data %>%
+  filter(season == 2013, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_13$IsStarter <- if_else(rush_13$name %in% starters_13, 1,0)
+
+t.test(rush_13$yards_gained[rush_13$IsStarter == 1], rush_13$yards_gained[rush_13$IsStarter == 0])
+
+
+#2014
+rush_14 <- rush_data %>%
+  filter(season == 2014, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_14$IsStarter <- if_else(rush_14$name %in% starters_14, 1,0)
+
+t.test(rush_14$yards_gained[rush_14$IsStarter == 1], rush_14$yards_gained[rush_14$IsStarter == 0])
+
+
+#2015
+rush_15 <- rush_data %>%
+  filter(season == 2015, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_15$IsStarter <- if_else(rush_15$name %in% starters_10, 1,0)
+
+t.test(rush_15$yards_gained[rush_15$IsStarter == 1], rush_15$yards_gained[rush_15$IsStarter == 0])
+
+
+#2016
+rush_16 <- rush_data %>%
+  filter(season == 2016, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_16$IsStarter <- if_else(rush_16$name %in% starters_16, 1,0)
+
+t.test(rush_16$yards_gained[rush_16$IsStarter == 1], rush_16$yards_gained[rush_16$IsStarter == 0])
+
+
+#2017
+rush_17 <- rush_data %>%
+  filter(season == 2017, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_17$IsStarter <- if_else(rush_17$name %in% starters_17, 1,0)
+
+t.test(rush_17$yards_gained[rush_17$IsStarter == 1], rush_17$yards_gained[rush_17$IsStarter == 0])
+
+
+#2018
+rush_18 <- rush_data %>%
+  filter(season == 2018, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+
+rush_18$IsStarter <- if_else(rush_18$name %in% starters_18, 1,0)
+
+t.test(rush_18$yards_gained[rush_18$IsStarter == 1], rush_18$yards_gained[rush_18$IsStarter == 0])
+```
+
+#Put Rush datasets together 
+```{r}
+rush_data_split <- bind_rows(rush_09,rush_10,rush_11,rush_12,rush_13,rush_14,rush_15,rush_16,rush_17,rush_18)
+rush_data_split$IsStarter <- as.factor(rush_data_split$IsStarter)
+```
+
+
+#Final Results for All Starters Vs Backups
+```{r}
+#Here is the final three tables that reveal the comps we are looking for
+
+#I decided to use only 1st and ten, 2nd and 10 or less, and 3rd and 4 or less. The idea being, respective downs with distances longer than what I used tend to result in defenses not playing base and allowing rushes to gain more than otherwise typical. In those longer down situations, it's plausible that third down backs get a leg up if they typically only carry on third and 9 or 15 or whatever. Just one more counter argument to anticipate and shoot down.
+rush_data_split %>%
+  filter(down == 1, ydstogo == 10) %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter) %>%
+  summarise(mean = mean (yards_gained), n = n())
+
+rush_data_split %>%
+  filter(down == 2, ydstogo < 11) %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter) %>%
+  summarise(mean = mean (yards_gained), n = n())
+
+rush_data_split %>%
+  filter(down == 3, ydstogo < 5) %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter) %>%
+  summarise(mean = mean (yards_gained), n = n())
+  
+
+
+```
+
+
+OK, the tweet I sent that specifically looked at the top of the top RBs from last year was done below. I basically made a dataset of 2018 rushes consisting of rushes from those teams with such studs (Elliot, Barkley, DJ, Gurley, CMC, Conner, Kamara,Melvin)
+
+##Look at 2018 only
+```{r}
+
+star_rb_teams_18 <- c("DAL","NYG","ARI","LA","CAR","PIT","NO","LAC")
+
+superstars <- rush_18 %>%
+  filter(play_type == "run", posteam %in% star_rb_teams_18, wp > .2, wp < .8, yardline_100 < 90, yardline_100 >10) %>%
+  group_by(down, ydstogo, IsStarter) %>%
+  summarize(season = 2018,YPC = mean(yards_gained), n = n()) %>%
+  arrange(down, ydstogo)
+superstars$IsStarter <- as.factor(superstars$IsStarter)
+
+
+#plug in down you want to run t.test below
+star_data <- rush_18 %>%
+  filter(posteam %in% star_rb_teams_18)
+
+#all scenarios
+star_data %>%
+  filter(play_type == "run") %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter)%>%
+  summarise(mean = mean(yards_gained), n = n())
+
+#1st down
+star_data %>%
+  filter(play_type == "run") %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter)%>%
+  filter(down == 1, ydstogo == 10) %>%
+  summarise(mean = mean(yards_gained), n = n())
+
+
+star_data %>%
+  filter(play_type == "run") %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter)%>%
+  filter(down == 2, ydstogo < 11) %>%
+  summarise(mean = mean(yards_gained), n = n())
+
+
+star_data %>%
+  filter(play_type == "run") %>%
+  drop_na(yards_gained) %>%
+  group_by(IsStarter)%>%
+  filter(down == 3, ydstogo < 5) %>%
+  summarise(mean = mean(yards_gained), n = n())
+
+
+```
