@@ -1,10 +1,14 @@
-An R notebook to show Josh Hermsmeyer my work and I'm not even remotely nervous I did anything wrong at all. Nope not one bit. I'm pretty sure I did something wrong..
+---
+title: "R Notebook"
+output: html_notebook
+---
+
 
 #Get Data 
 
 The RDS is from Ben Baldwin's cleaning of NFLScrapR so I blame any potential flaws on him regarless of anything else. 
 ```{r}
-Official_NFL_PBP_CLEANED <- readRDS("Official_NFL_PBP_CLEANED.rds")
+Official_NFL_PBP_CLEANED <- readRDS("D:/NFL Play by Play/ScrapR Cleaned/Official_NFL_PBP_CLEANED.rds")
 library(tidyverse)
 rush_data <- Official_NFL_PBP_CLEANED %>%
   filter(play_type == "run")%>%
@@ -14,27 +18,58 @@ rush_data <- Official_NFL_PBP_CLEANED %>%
 
 #Add Data
 
-Make objects for each seasons starting RBS. These might not be perfect but should be very close. I took this from PFR top backs listed in each year and eye-balled to try to take out any backup backs.
+Make objects for each seasons starting RBS. These might not be perfect but should be very close. I took this from PFR top backs listed in each year and eye-balled to try to take out any backup backs.Some teams with weak RBs and low usuage were all just classified as backups.
+
+(note: there is an A.Peterson RB on the bears this year. take his six carries out of this...
+C.Wells is really B.Wells, NFLScrapR error I presume)
 ```{r}
-starters_09 <- c("C.Johnson", "T.Jones", "S.Jackson", "A.Peterson","M.Jones-Drew","C.Benson","R.Grant","M.Forte","R.Rice","K.Moreno","R.Mendenhall","R.Williams","F.Jackson","F.Gore","B.Jacobs","L.Tomlinson","J.Stewart","J.Addai","K.Smith","D.Williams","M.Barber","C.Williams","J.Harrison","L.Maroney","J.Charles","L.Johnson","M.Turner","J.Jones","B.Wells", "L.McCoy", "M.Bell")
+starters_09 <- c("C.Johnson", "T.Jones", "S.Jackson", "A.Peterson","M.Jones-Drew","C.Benson","R.Grant","M.Forte","R.Rice","K.Moreno","R.Mendenhall","R.Williams","F.Jackson","F.Gore","B.Jacobs","L.Tomlinson","J.Stewart","J.Addai","K.Smith","Kv.Smith","D.Williams","M.Barber","C.Williams","J.Lewis","L.Maroney","J.Charles","L.Johnson","M.Turner","J.Jones","B.Wells", "L.McCoy", "M.Bell", "S.Slayton", "D.McFadden", "C.Portis")
 
-starters_10 <- c("M.Turner", "S.Jackson","A.Foster","R.Mendenhall","C.Benson","C.Johnson","R.Rice","M.Jones-Drew","A.Peterson","A.Bradshaw","P.Hillis","T.Jones","M.Forte","J.Charles","B.Green-Ellis","D.McFadden","F.Jackson","L.Tomlinson","L.McCoy","F.Gore","M.Lynch","L.Bount","R.Brown","B.Jackson","S.Greene","F.Jones","K.Moreno","M.Tolbert","J.Stewart","J.Best")
+backups_09 <- c("S.Morris","K.Faulk","F.Taylor","L.Washington","S.Greene","D.Woodhead","R.Brown", "L.Hilliard","M.Lynch","B.Scott","B.Leonard","W.McGahee", "J.Parmele","M.Lawrence", "J.Harrison","C.Jennings","J.Davis", "D.Brown","C.Simpson", "M.Hart", "A.Foster", "C.Brown", "R.Moats", "L.White","J.Ringer","R.Jennings","D.Sproles","M.Bennett", "C.Buckhalter","L.Jordan","J.Fargas","M.Bush","L.Johnson","J.Williams", "J.Battle","Ko.Smith","T.Castille","F.Jones","T.Choice", "B.Westbrook","E.Buckley","A.Bradshaw","D.Ware","G.Johnson","Q.Ganther","R.Cartwright","L.Betts", "C.Taylor", "A.Young","A.Green", "B.Jackson","D.Wynn","K.Bell","G.Wolfe", "M.Morris","L.Hamilton","R.Bush","P.Thomas","J.Snelling","A.Stecker", "D.Williams","T.Sutton", "M.Goodson", "D.Ward", "C.Smith", "C.Wells","L.Stephens-Howling","J.Wright","J.Forsett", "E.James", "L.Rankin", "C.Ogbonnaya","K.Darby", "s.Gado")
 
-starters_11 <- c("M.Jones-Drew","M.Turner","R.Rice","M.Lynch","F.Gore","A.Foster","C.Benson","L.McCoy","C.Johnson","S.Jackson","M.Bush","S.Greene","W.McGahee","B.Wells","R.Mendenhall","R.Mathews","R.Bush","A.Peterson","M.Forte","L.Blount","B.Green-Ellis","B.Tate","A.Bradshaw","F.Jackson","D.Thomas","D.Murray","P.Hillis","D.Williams","T.Jones")
 
-starters_12 <- c("A.Foster","A.Peterson","A.Morris","D.Martin","M.Lynch","S.Ridley","J.Charles","B.Green-Ellis","S.Greene","C.Johnson","T.Richardson","F.Gore","S.Jackson","R.Rice","M.Forte","R.Bush","M.Turner","A.Bradshaw","D.McFadden","M.Leshoure","V.Ballard","C.Spiller","L.McCoy","R.Mathews","D.Williams","W.McGahee","D.Murray","J.Dwyer","M.Ingram","K.Moreno", "A.Green")
+starters_10 <- c("M.Turner", "S.Jackson","A.Foster","R.Mendenhall","C.Benson","C.Johnson","R.Rice","M.Jones-Drew","A.Peterson","A.Bradshaw","P.Hillis","T.Jones","M.Forte","T.Jones","B.Green-Ellis","D.McFadden","F.Jackson","L.Tomlinson","L.McCoy","F.Gore","M.Lynch","L.Bount","R.Brown","B.Jackson","S.Greene","F.Jones","K.Moreno","R.Mathews","J.Stewart","J.Best","D.Brown","R.Torrain","C.Ivory","T.Hightower")
 
-starters_13 <- c("L.McCoy","M.Lynch","M.Forte","R.Mathews","E.Lacy","C.Johnson","A.Peterson","F.Gore","A.Morris","J.Charles","Z.Stacy","L.Bell","K.Moreno","M.Jones-Drew","R.Bush","B.Green-Ellis","R.Mendenhall","D.Murray","R.Rice","F.Jackson","D.Williams","T.Richardson","C.Ivory","B.Tate","S.Ridley","L.Miller","S.Jackson","R.Jennings","P.Thomas")
+backups_10 <- c("B.Tate","D.Woodhead","F.Taylor","K.Faulk","S.Morris","T.Clayton","J.McKnight","S.Greene","R.Williams","M.Lynch","C.Spiller","I.Redman","J.Dwyer","M.Moore","M.McGahee","J.Harrison","M.Bell","B.Scott","Be.Scott","C.Peerman","C.Pressley","B.Leonard","J.Addai","D.Rhodes","J.James","M.Hart","R.Jennings","D.Karim","S.Slayton","D.Ward","J.Ringer","D.McCluster","J.Charles","J.Battle","D.Sproles","M.Tolbert","M.Bush","C.Buckhalter","L.Maroney","L.Ball","J.Harrison","E.Buckley","M.Bell","B.Jacobs","D.Ware","M.Barber","T.Choice","C.Portis","K.Williams","J.Davis","L.Johnson","C.Taylor","G.Wolfe","J.Starks","R.Grant","M.Morris","K.Smith","T.Gerhart","J.Snelling","J.Jones","L.Betts","P.Thomas","C.Williams","D.Williams","M.Goodson","T.Sutton","J.Forsett","L.Washington","K.Darby","K.Toston","A.Dixon","B.Westbrook","C.Wells","L.Stephens-Howling","J.Wright")
 
-starters_14 <- c("D.Murray","L.McCoy","L.Bell","M.Lynch","M.Forte","A.Morris","A.Foster","F.Gore","E.Lacy","J.Forsett","M.Ingram","J.Bell","J.Hill","A.Williams","L.Miller","J.Charles","A.Ellington","C.Ivory","s.Jackson","C.Anderson","T.Mason","J.Stewart","T.West","A.Blue","G.Bernard","M.Asiata", "B.Oliver","T.Richardson")
+starters_11 <- c("M.Jones-Drew","M.Turner","R.Rice","M.Lynch","F.Gore","A.Foster","C.Benson","L.McCoy","C.Johnson","S.Jackson","M.Bush","S.Greene","W.McGahee","C.Wells","R.Mendenhall","R.Mathews","R.Bush","A.Peterson","M.Forte","L.Blount","B.Green-Ellis","B.Tate","A.Bradshaw","F.Jackson","D.Thomas","D.Murray","P.Hillis","D.Williams","T.Jones","J.Addai","R.Grant")
 
-starters_15 <- c("A.Peterson","D.Martin","L.Murray","D.Freeman","F.Gore","C.Ivory","J.Stewart","D.McFadden","T.Gurley","J.Hill","M.Forte","R.Hillman","L.McCoy","A.Morris","D.Williams","C.Johnson","R.Jennings","L.Miller","D.Murray","E.Lacy","I.Crowell","M.Gordon","A.Blue","T.Yeldon","M.Ingram","L.Blount","C.West","J.Starks","T.Rawls")
+backups_11 <- c("D.Woodhead","K.Faulk","S.Ridley","S.Vereen","L.Tomlinson","B.Powell","J.McKnight","D.Thomas","S.Slayton","C.Spiller","T.Choice","J.White","R.Williams","B.Scott","B.Leonard","C.Peerman","C.Ogbonnaya","M.Hardesty","B.Tate","D.Ward","S.Slayton","J.Harper","J.Ringer","N.Washington","D.Harris","D.Karim","M.Owens","D.Brown","D.Carter","K.Moreno","D.Thomas","J.Johnson","L.Ball","M.Tolbert","C.Brinkley","D.McFadden","D.McCluster","J.Battle","J.Charles","B.Jacobs","D.Ware","D.Scott","R.Brown","D.Lewis","F.Jones","P.Tanner","T.Choice","S.Morris","T.Hightower","R.Helu","R.Helu","E.Royster","J.Starks","A.Green","B.Saine","J.Best","K.Smith","K.Williams","M.Morris","M.Barber","K.Bell","A.Allen","T.Gerhart","L.Booker","P.Thomas","C.Ivory","M.Ingram","D.Sproles","J.Rodgers","J.Snelling","J.Stewart","E.Graham","K.Lumpkin","M.Madu","K.Hunter","A.Dixon","L.Stephens-Howling","C.Taylor","A.Smith","J.Forsett","L.Washington","C.Williams","J.Norwood")
 
-starters_16 <- c("E.Elliot","L.Blount","D.Johnson","D.Murray","T.Gurley","L.Miller","F.Gore","L.Bell","J.Ajayi","M.Gordon","J.Howard","L.McCoy","D.Freeman","J.Hill","M.Forte","J.Stewart","C.Hyde","S.Ware","M.Ingram","I.Crowell","L.Murray","T.West","R.Jennings","D.Booker","R.Kelly","J.McKinnon","R.Mathews","D.Martin", "T.Yeldon")
 
-starters_17 <- c("L.Bell","L.McCoy","M.Gordon","T.Gurley","J.Howard","K.Hunt","L.Fournette","F.Gore","C.Anderson","E.Elliot","C.Hyde","L.Miller","M.Ingram","L.Murray","A.Collins","J.Ajayi","M.Lynch","I.Crowell","J.Stewart","D.Freeman","D.Murray","D.Lewis","J.Mixon","B.Powell","D.Henry","S.Perine","L.Blount","O.Darkwa","A.Abdullah","J.Williams")
+starters_12 <- c("A.Foster","A.Peterson","A.Morris","D.Martin","M.Lynch","S.Ridley","J.Charles","B.Green-Ellis","S.Greene","C.Johnson","T.Richardson","F.Gore","S.Jackson","R.Rice","M.Forte","R.Bush","M.Turner","A.Bradshaw","D.McFadden","M.Leshoure","V.Ballard","C.Spiller","L.McCoy","R.Mathews","D.Williams","W.McGahee","D.Murray","M.Ingram","K.Moreno", "A.Green")
 
-starters_18 <- c("E.Elliot","S.Barkley","D.Johnson","T.Gurley","A.Peterson","J.Howard","C.Carson","J.Mixon","P.Barber","C.McCaffrey","J.Conner","D.Henry","L.Miller","S.Michel","M.Mack","A.Kamara","N.Chubb","P.Lindsay","K.Hunt","M.Gordon","C.Hyde","D.Martin","T.Coleman","L.McCoy","F.Gore","L.Blount")
+backups_12 <- c("S.Vereen","D.Woodhead","B.Bolden","D.Thomas","L.Miller","B.Powell","J.McKnight","F.Jackson","J.White","T.Choice","A.Allen","B.Pierce","C.Peerman","B.Leonard","B.Scott","D.Herron","J.Dwyer","R.Mendenhall","I.Redman","C.Rainey","C.Ogbonnaya","M.Hardesty","B.Jackson","J.Forsett","B.Tate","K.Martin","D.Brown","J.Harper","J.Ringer","M.Jones-Drew","J.Parmele","R.Jennings","R.Murphy","M.Owens","K.Moreno","R.Hillman","L.Ball","C.Brinkley","J.Battle","R.Brown","J.Stewart","M.Goodson","P.Hillis","S.Draughn","D.McCluster","E.Royster","R.Helu","A.Brown","D.Wilson","K.Lumpkin","D.Scott","F.Jones","L.Dunbar","P.Tanner","B.Brown","D.Lewis","C.Benson","D.Harris","J.Starks","R.Grant","M.Asiata","T.Gerhart","A.Allen","K.Bell","M.Bush","J.Bell","K.Smith","J.Snelling","Jz. Rodgers","J.Stewart","M.Tolbert","C.Ivory","D.Sproles","P.Thomas","T.Cadet","D.Ware","L.Blount","A.Dixon","B.Jacobs","K.Hunter","K.Williams","L.James","L.Washington","R.Turbin","D.Richardson","I.Pead","C.Wells","L.Stephens-Howling","R.Williams","W.Powell")
+
+
+starters_13 <- c("L.McCoy","M.Lynch","M.Forte","R.Mathews","E.Lacy","C.Johnson","A.Peterson","F.Gore","A.Morris","J.Charles","Z.Stacy","L.Bell","K.Moreno","M.Jones-Drew","R.Bush","B.Green-Ellis","R.Mendenhall","D.Murray","R.Rice","F.Jackson","D.Williams","De.Williams","T.Richardson","C.Ivory","B.Tate","S.Ridley","L.Miller","S.Jackson","R.Jennings","P.Thomas","A.Foster","A.Brown")
+
+backups_13 <- c("B.Bolden","L.Blount","S.Vereen","L.Washington","A.Green","B.Powell","D.Thomas","Dan.Thomas","M.Gillislee","C.Spiller","T.Choice","G.Bernard","C.Peerman","L.Stephens-Howling","F.Jones","I.Redman","J.Dwyer","B.Pierce","B.Scott","S.Draughn","B.Rainey","C.Ogbonnaya","E.Baker","F.Whittaker","T.Richardson","W.McGahee","A.Bradshaw","D.Brown","D.Herron","T.Choice","V.Ballard","J.Battle","S.Greene","J.Todman","J.Forsett","B.Tate","D.Johnson","K.Karim","J.Grimes","M.Ball","C.Anderson","R.Hillman","D.McCluster","K.Davis","D.Woodhead","R.Brown","R.Jennings","B.Brown","C.Polk","J.Randle","L.Dunbar","P.Tanner","B.Jacobs","D.Scott","D.Wilson","P.Hillis","E.Royster","R.Helu","J.Franklin","J.Starks","M.Bush","M.Leshoure","J.Bell","M.Asiata","T.Gerhart","D.Williams","K.Barner","M.Tolbert","D.Sproles","J.Collins","K.Robinson","M.Ingram","J.Rodgers","J.Snelling","B.Leonard","B.Rainey","D.Martin","M.James","C.Michael","R.Turbin","S.Ware","A.Dixon","K.Hunter","L.James","A.Ellington","S.Taylor","B.Cunnningham","D.Richardson","I.Pead","S.Bailey")
+
+
+starters_14 <- c("D.Murray","L.McCoy","L.Bell","M.Lynch","M.Forte","A.Morris","A.Foster","F.Gore","E.Lacy","J.Forsett","M.Ingram","J.Bell","J.Hill","A.Williams","L.Miller","J.Charles","A.Ellington","C.Ivory","s.Jackson","C.Anderson","T.Mason","J.Stewart","T.West","A.Blue","G.Bernard","M.Asiata", "B.Oliver","T.Richardson","B.Sankey","D.Martin")
+
+backups_14 <- c("B.Bolden","L.Blount","S.Vereen","J.Gray","J.White","S.Ridley","A.Dixon","B.Brown","C.Spiller","D.Williams","Da.Thomas","danielThomas","Dn. Thomas","Dn.Thomas","K.Moreno","L.James","R.Mattews","B.Powell","C.Johnson","L.Blount","A.Green","B.Tate","C.Peerman","G.Bernard","R.Burkhead","B.Pierce","L.Taliaferro","B.Tate","I.Crowell","A.Bradshaw","D.Herron","Z.Tipton","A.Blue","J.Grimes","R.Brown","D.Robinson","J.Todman","S.Johnson","T.Gerhart","D.McCluster","J.Battle","L.Washington","S.Greene","J.Stewart","J.Thompson","M.Ball","R.Hillman","D.Brown","D.Woodhead","R.Brown","R.Mathews","Ry.Mathews","S.Draughn","D.Thomas","K.Davis","L.Murray","M.Jones-Drew","J.Randle","L.Dunbar","D.Harris","C.Polk","D.Sproles","O.Darkwa","R.Jennings","P.Hillis","C.Thompson","R.Helu","S.Redd","D.Harris","J.Starks","R.Bush","T.Riddick","A.Peterson","J.McKinnon","J.Banyard","B.Tate","K.Carey","C.Williams","C.Ogbonnaya","D.Reaves","D.Williams","F.Whittaker","M.Tolbert","K.Robinson","P.Thomas","T.Cadet","D.Freeman","J.Rodgers","B.Rainey","C.Michael","R.Turbin","J.Dwyer","J.parmele","K.Williams","S.Taylor","R.Hughes","Alf.Smith","B.Ellington","C.Hyde","L.James","B.Cunningham","Z.Stacy")
+
+
+starters_15 <- c("A.Peterson","D.Martin","L.Murray","D.Freeman","F.Gore","C.Ivory","J.Stewart","D.McFadden","T.Gurley","J.Hill","M.Forte","R.Hillman","L.McCoy","A.Morris","L.Bell","C.Johnson","R.Jennings","L.Miller","D.Murray","E.Lacy","I.Crowell","M.Gordon","A.Blue","T.Yeldon","M.Ingram","L.Blount","C.West","J.Starks","T.Rawls","J.Forsett","A.Andrews")
+
+backups_15 <- c("B.Bolden","D.Lewis","J.White","K.Martin","S.Jackson","B.Powell","S.Ridley","Z.Stacy","A.Dixon","D.Herron","K.Williams","Ka.Williams","M.Gillislee","D.Williams","Da.Williams","J.Ajayi","J.Gray","R.Matthews","G.Bernard","R.Burkhead","D.Williams","De.Williams","F.Toussaint","J.Todman","D.Williams","De.Williams","F.Toussaint","J.Todman","J.Allen","L.Taliaferro","T.West","D.Johnson","D.Johnson Jr","R.Turbin","S.Draughn","A.Foster","C.Polk","A.Hunt","A.Bradshaw","J.Robinson","D.Herron","Z.Tipton","D.Robinson","J.Gray","T.Gerhart","B.Pierce","B.Sankey","D.Cobb","D.McCluster","T.West","C.Anderson","J.Thompson","K.Davis","S.Ware","R.Helu","T.Jones","B.Oliver","D.Brown","D.Woodhead","C.Thompson","M.Jones","P.Thomas","D.Sproles","K.Barner","R.Mathews","A.Williams","D.Harris","O.Darkwa","S.Vereen","C.Michael","J.Randle","L.Dunbar","R.Turbin","J.McKinnon","M.Asiata","J.Starks","T.Montgomery","J.Bell","T.Jones","T.Riddick","Z.Zenner","J.Langford","K.Carey","C.Artis-Payne","C.Brown","F.Whittaker","M.Tolbert","T.Coleman","T.Ward","C.Spiller","K.Hunter","K.Robinson","T.Cadet","T.Hightower","B.Rainey","A.Ellington","D.Johnson","K.Williams","S.Taylor","B.Brown","C.Michael","D.Coleman","D.Harris","F.Jackson","F.Jackson","B.Cunningham","I.Pead","M.Brown","T.Mason","D.Harris","J.Hayne","K.Gaskins","M.Davis","P.Thomas","R.Bush","S.Draughn","T.Cadet")
+
+
+starters_16 <- c("E.Elliot","L.Blount","D.Johnson","D.Murray","T.Gurley","L.Miller","F.Gore","L.Bell","J.Ajayi","M.Gordon","J.Howard","L.McCoy","D.Freeman","J.Hill","M.Forte","J.Stewart","C.Hyde","S.Ware","M.Ingram","I.Crowell","L.Murray","T.West","R.Jennings","R.Kelly","J.McKinnon","R.Mathews","D.Martin", "T.Yeldon")
+
+backups_16 <- c("B.Bolden","D.Lewis","J.White","A.Foster","D.Williams","I.Pead","K.Drake","B.Tate","J.Williams","M.Gillislee","R.Bush","B.Powell","C.Spiller","K.Robinson","T.Pope","B.Wilds","B.Burks","D.Williams","F.Toussaint","J.Allen","K.Dixon","J.Forsett","C.Peerman","G.Bernard","R.Burkhead","D.Johnson","D.Johnson Jr.","A.Blue","A.Hunt","J.Grimes","D.Henry","J.Ferguson","J.Todman","R.Turban","C.Grant","C.Ivory","D.Robinson","C.West","J.Charles","K.Davis","D.Washington","J.Richard","T.Jones","C.Anderson","J.Forsett","K.Bibbs","D.Booker","A.Williams","D.McCluster","D.Woodhead","K.Farrow","R.Hillman","A.Morris","D.McFadden","L.Dunbar","B.Rainey","O.Darkwa","P.Perkins","S.Vereen","C.Thompson","M.Jones","M.Brown","D.Sproles","K.Barner","W.Smallwood","B.Marshall","T.Watson","C.Michael","E.Lacy","J.Starks","T.Montgomery","A.Abdullah","D.Washington","J.Forsett","T.Riddick","Z.Zenner","A.Peterson","M.Asiata","R.Hillman","J.Bell","J.Langford","K.Carey","S.Ridley","T.Coleman","T.Ward","J.Rodgers","P.Barber","T.Cadet","T.Hightower","C.Artis-Payne","F.Whittaker","M.Tolbert","A.collins","C.Michael","C.Prosise","C.Spiller","T.Rawls","A.Ellington","C.Johnson","K.Williams","S.Taylor","B.Cunningham","M.Brown","D.Harris","M.Davis","R.Mostert","S.Draughn")
+
+
+starters_17 <- c("L.Bell","L.McCoy","M.Gordon","T.Gurley","J.Howard","K.Hunt","L.Fournette","F.Gore","C.Anderson","E.Elliot","C.Hyde","L.Miller","M.Ingram","D.Cook","A.Collins","J.Ajayi","M.Lynch","I.Crowell","J.Stewart","C.McCaffrey","D.Freeman","D.Murray","D.Lewis","J.Mixon","B.Powell","D.Henry","S.Perine","L.Blount","O.Darkwa","A.Abdullah","J.Williams","L.Blount","D.Martin")
+
+backups_17 <- c("B.Bolden","J.White","M.Gillislee","R.Burkhead","D.Williams","K.Drake","M.Gray","S.Perry","D.Thompson","M.Murphy","T.Tolbert","T.Cadet","E.McGuire","M.Forte","T.Cadet","F.Toussaint","J.Conner","S.Ridley","D.Woodhead","J.Allen","T.West","G.Bernarnd","J.Hill","D.Johnson","D.Johnson Jr.","M.Dayes","C.Ivory","T.Yeldon","T.Bohanon","C.Grant","D.Fluellen","D.Henry","M.Mack","R.Turbin","A.Blue","A.Ellington","D.Foreman","A.Hunt","C.Spiller","C.West","A.Ekeler","B.Oliver","D.Washington","J.Richard","D.Booker","D.Henderson","J.Charles","C.Clement","D.Sproles","J.Ajayi","W.Smallwood","K.Barner","A.Morris","D.McFadden","R.Smith","C.Thompson","K.Bibbs","M.Brown","R.Kelley","S.Perine","O.Darkwa","P.Perkins","S.Vereen","W.Gallman","J.McKinnon","L.Murray","D.Washington","T.Riddick","Z.Zenner","T.Green","A.Jones","T.Montgomery","J.Williams","B.Cunningham","T.Cohen","A.Kamara","A.Peterson","J.Hill","T.Edmunds","C.Artis-Payne","F.Whittaker","D.Coleman","T.Coleman","T.Ward","J.Rodgers","P.Barber","L.Dunbar","M.Brown","C.Carson","C.Prosise","E.Lacy","J.McKissic","M.Davis","T.Rawls","A.Ellington","C.Johnson","D.Foster","C.Wiliams","E.Penny","K.Williams","A.Peterson","C.Williams","D.Foster","M.Breida","R.Mostert")
+
+
+starters_18 <- c("E.Elliot","S.Barkley","D.Johnson","T.Gurley","A.Peterson","J.Howard","C.Carson","J.Mixon","P.Barber","C.McCaffrey","J.Conner","D.Henry","L.Miller","S.Michel","M.Mack","A.Kamara","N.Chubb","P.Lindsay","K.Hunt","M.Gordon","C.Hyde","D.Martin","T.Coleman","L.McCoy","F.Gore","L.Blount", "I.Crowell","A.Collins", "J.Adams","A.Jones","M.Breida")
+
+backups_18 <- c("J.White","C.Patterson","K.Barner","J.Hill","R.Burkhead", "K.Drake","K.Ballage","B.Bolden","C.Ivory","K.Ford","M.Murphy", "E.McGuire","T.Cannon", "D.Henderson", "G.Edwards","T.Montgomery","J.Allen", "K.Dixon","J.Samuels","S.Ridley","C.Hyde","D.Johnson","G.Bernard", "M.Walton", "D.Foreman","A.Blue", "C.Michael","J.Wilkins","N.Hines","R.Turbin", "D.Lewis","D.Fluellen","J.Charles", "C.Grant","T.Yeldon", "B.Wilds", "Dam.Williams","Dar.Williams","S.Ware","C.West","A.Ekeler","J.Jackson", "R.Freeman","D.Booker","D.Washington","J.Richard","M.Lynch","R.Smith","D.Jackson","J.Ajayi","D.Sproles","C.Clement","W.Smallwood","C.Thompson","R.Kelley","S.Perine","K.Bibbs","W.Gallman","E.Penny","J.Stewart","B.Cunningham","T.Cohen","L.Murray","M.Boone","T.Montgomery","J.Williams","A.Abdullah","K.Johnson","T.Riddick","Z.Zenner","M.Ingram","D.Washington","M.Gillislee","D.Freeman","I.Smith","B.Hill","J.Langford","C.Anderson","C.Artis-Payne","T.Cadet","J.Rodgers","R.Jones","J.Jones II","C.Anderson","J.Kelly","M.Brown","C.Prosise","J.McKissic","M.Davis","R.Penny","A.Morris","R.Mostert","C.Edmonds")
 
 ```
 
@@ -43,7 +78,8 @@ starters_18 <- c("E.Elliot","S.Barkley","D.Johnson","T.Gurley","A.Peterson","J.H
 ```{r}
 #2009
 rush_09 <- rush_data %>%
-  filter(season == 2009, yardline_100 > 10, yardline_100 < 90, wp > .19, wp < .81)
+  filter(season == 2009, yardline_100 > 10, yardline_100 < 90, wp > .19, wp < .81)%>%
+  filter(name %in% starters_09 | name %in% backups_09)
 
 rush_09$IsStarter <- if_else(rush_09$name %in% starters_09, 1,0)
 
@@ -53,7 +89,8 @@ t.test(rush_09$yards_gained[rush_09$IsStarter == 1], rush_09$yards_gained[rush_0
 
 #2010
 rush_10 <- rush_data %>%
-  filter(season == 2010, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2010, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_10 | name %in% backups_10)
 
 rush_10$IsStarter <- if_else(rush_10$name %in% starters_10, 1,0)
 
@@ -61,7 +98,8 @@ t.test(rush_10$yards_gained[rush_10$IsStarter == 1], rush_10$yards_gained[rush_1
 
 #2011
 rush_11 <- rush_data %>%
-  filter(season == 2011,yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2011,yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_11 | name %in% backups_11)
 
 rush_11$IsStarter <- if_else(rush_11$name %in% starters_11, 1,0)
 
@@ -70,7 +108,8 @@ t.test(rush_11$yards_gained[rush_11$IsStarter == 1], rush_11$yards_gained[rush_1
 
 #2012
 rush_12 <- rush_data %>%
-  filter(season == 2012, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2012, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_12 | name %in% backups_12)
 
 rush_12$IsStarter <- if_else(rush_12$name %in% starters_12, 1,0)
 
@@ -78,7 +117,8 @@ t.test(rush_12$yards_gained[rush_12$IsStarter == 1], rush_12$yards_gained[rush_1
 
 #2013
 rush_13 <- rush_data %>%
-  filter(season == 2013, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2013, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_13 | name %in% backups_13)
 
 rush_13$IsStarter <- if_else(rush_13$name %in% starters_13, 1,0)
 
@@ -87,7 +127,8 @@ t.test(rush_13$yards_gained[rush_13$IsStarter == 1], rush_13$yards_gained[rush_1
 
 #2014
 rush_14 <- rush_data %>%
-  filter(season == 2014, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2014, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_14 | name %in% backups_14)
 
 rush_14$IsStarter <- if_else(rush_14$name %in% starters_14, 1,0)
 
@@ -96,7 +137,8 @@ t.test(rush_14$yards_gained[rush_14$IsStarter == 1], rush_14$yards_gained[rush_1
 
 #2015
 rush_15 <- rush_data %>%
-  filter(season == 2015, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2015, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_15 | name %in% backups_15)
 
 rush_15$IsStarter <- if_else(rush_15$name %in% starters_10, 1,0)
 
@@ -105,7 +147,8 @@ t.test(rush_15$yards_gained[rush_15$IsStarter == 1], rush_15$yards_gained[rush_1
 
 #2016
 rush_16 <- rush_data %>%
-  filter(season == 2016, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2016, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_16 | name %in% backups_16)
 
 rush_16$IsStarter <- if_else(rush_16$name %in% starters_16, 1,0)
 
@@ -114,7 +157,8 @@ t.test(rush_16$yards_gained[rush_16$IsStarter == 1], rush_16$yards_gained[rush_1
 
 #2017
 rush_17 <- rush_data %>%
-  filter(season == 2017, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2017, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_17 | name %in% backups_17)
 
 rush_17$IsStarter <- if_else(rush_17$name %in% starters_17, 1,0)
 
@@ -123,7 +167,8 @@ t.test(rush_17$yards_gained[rush_17$IsStarter == 1], rush_17$yards_gained[rush_1
 
 #2018
 rush_18 <- rush_data %>%
-  filter(season == 2018, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)
+  filter(season == 2018, yardline_100 > 10, yardline_100 < 90,wp > .19, wp < .81)%>%
+  filter(name %in% starters_18 | name %in% backups_18)
 
 rush_18$IsStarter <- if_else(rush_18$name %in% starters_18, 1,0)
 
@@ -141,21 +186,20 @@ rush_data_split$IsStarter <- as.factor(rush_data_split$IsStarter)
 ```{r}
 #Here is the final three tables that reveal the comps we are looking for
 
-#I decided to use only 1st and ten, 2nd and 10 or less, and 3rd and 4 or less. The idea being, respective downs with distances longer than what I used tend to result in defenses not playing base and allowing rushes to gain more than otherwise typical. In those longer down situations, it's plausible that third down backs get a leg up if they typically only carry on third and 9 or 15 or whatever. Just one more counter argument to anticipate and shoot down.
 rush_data_split %>%
-  filter(down == 1, ydstogo == 10) %>%
+  filter(down == 1) %>%
   drop_na(yards_gained) %>%
   group_by(IsStarter) %>%
   summarise(mean = mean (yards_gained), n = n())
 
 rush_data_split %>%
-  filter(down == 2, ydstogo < 11) %>%
+  filter(down == 2) %>%
   drop_na(yards_gained) %>%
   group_by(IsStarter) %>%
   summarise(mean = mean (yards_gained), n = n())
 
 rush_data_split %>%
-  filter(down == 3, ydstogo < 5) %>%
+  filter(down == 3) %>%
   drop_na(yards_gained) %>%
   group_by(IsStarter) %>%
   summarise(mean = mean (yards_gained), n = n())
@@ -168,52 +212,43 @@ rush_data_split %>%
 OK, the tweet I sent that specifically looked at the top of the top RBs from last year was done below. I basically made a dataset of 2018 rushes consisting of rushes from those teams with such studs (Elliot, Barkley, DJ, Gurley, CMC, Conner, Kamara,Melvin)
 
 ##Look at 2018 only
-```{r}
 
+Star_rb_teams_18 objects are grouped in a few different ways. The first (default) is by using the teams with top acclaimed stars - players fans would gush over (Zeke,Saquon,DJ,Gurley,CMC,Conner,Kamara,Melvin). The next grouping the top five contract earners with is really 4 bc Bell didn't play, and finally the the last grouping is top 5 in rushing yards from 2018. Any way you slice it, the diff is not super dramatic. 
+```{r}
+#Arguably the best of the best from fans perspective
 star_rb_teams_18 <- c("DAL","NYG","ARI","LA","CAR","PIT","NO","LAC")
 
-superstars <- rush_18 %>%
-  filter(play_type == "run", posteam %in% star_rb_teams_18, wp > .2, wp < .8, yardline_100 < 90, yardline_100 >10) %>%
-  group_by(down, ydstogo, IsStarter) %>%
-  summarize(season = 2018,YPC = mean(yards_gained), n = n()) %>%
-  arrange(down, ydstogo)
-superstars$IsStarter <- as.factor(superstars$IsStarter)
+#Top 4 contract earners as of 2019 (Bell was the 5th top but obv didnt' play)
+#star_rb_teams_18 <- c("DAL","ARI","LA","ATL")
 
+#Top 5 in yards for 2018
+#star_rb_teams_18 <- c("DAL","NYG","LA","CIN","SEA")
 
-#plug in down you want to run t.test below
 star_data <- rush_18 %>%
   filter(posteam %in% star_rb_teams_18)
 
 #all scenarios
 star_data %>%
-  filter(play_type == "run") %>%
-  drop_na(yards_gained) %>%
   group_by(IsStarter)%>%
   summarise(mean = mean(yards_gained), n = n())
 
-#1st down
 star_data %>%
-  filter(play_type == "run") %>%
-  drop_na(yards_gained) %>%
   group_by(IsStarter)%>%
-  filter(down == 1, ydstogo == 10) %>%
+  filter(down == 1) %>%
   summarise(mean = mean(yards_gained), n = n())
 
 
 star_data %>%
-  filter(play_type == "run") %>%
-  drop_na(yards_gained) %>%
   group_by(IsStarter)%>%
-  filter(down == 2, ydstogo < 11) %>%
+  filter(down == 2) %>%
   summarise(mean = mean(yards_gained), n = n())
 
 
 star_data %>%
-  filter(play_type == "run") %>%
-  drop_na(yards_gained) %>%
   group_by(IsStarter)%>%
-  filter(down == 3, ydstogo < 5) %>%
+  filter(down == 3) %>%
   summarise(mean = mean(yards_gained), n = n())
 
 
 ```
+ 
